@@ -1,6 +1,6 @@
-import {GetServerSideProps, NextPage} from 'next';
-import {UAParser} from 'ua-parser-js';
-import {useEffect, useState} from 'react';
+import { GetServerSideProps, NextPage } from 'next';
+import { UAParser } from 'ua-parser-js';
+import { useEffect, useState } from 'react';
 
 type Props = {
   browser: {
@@ -10,7 +10,7 @@ type Props = {
   }
 }
 const index: NextPage<Props> = (props) => {
-  const {browser} = props;
+  const { browser } = props;
   const [width, setWidth] = useState(0);
   useEffect(() => {
     const w = document.documentElement.clientWidth;
@@ -23,6 +23,7 @@ const index: NextPage<Props> = (props) => {
     </div>
   );
 };
+
 export default index;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
