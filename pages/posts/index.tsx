@@ -1,14 +1,15 @@
-import {GetStaticProps, NextPage} from 'next';
-import {usePosts} from '../../hooks/usePosts';
-import {useCallback} from 'react';
-import {getPosts} from '../../lib/posts';
+import React, { useCallback } from 'react';
+import { GetStaticProps, NextPage } from 'next';
 import Link from 'next/link';
+
+import { usePosts } from '../../hooks/usePosts';
+import { getPosts } from '../../lib/posts';
 
 type Props = {
   posts: Post[];
 }
 const PostsIndex: NextPage<Props> = (props) => {
-  const {posts} = props;
+  const { posts } = props;
   console.log(posts);
   return (
     <div>

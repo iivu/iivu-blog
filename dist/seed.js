@@ -12,38 +12,49 @@ var _typeorm = require("typeorm");
 
 var _Post = require("./entity/Post");
 
+var _User = require("./entity/User");
+
+var _Comment = require("./entity/Comment");
+
 (0, _typeorm.createConnection)().then( /*#__PURE__*/function () {
   var _ref = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee(connection) {
-    var post;
+    var manager, u1, post1, c1;
     return _regenerator["default"].wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
-            console.log('Inserting a new user into the database...');
-            _context.next = 3;
-            return connection.manager.find(_Post.Post);
-
-          case 3:
-            post = _context.sent;
-
-            if (post.length) {
-              _context.next = 8;
-              break;
-            }
-
+            console.log('Running seed...');
+            manager = connection.manager;
+            u1 = new _User.User();
+            u1.username = 'Leo Cheung';
+            u1.passwordDigest = 'xxx';
             _context.next = 7;
-            return connection.manager.save(Array(20).fill(1).map(function (_, index) {
-              return new _Post.Post("Post".concat(index + 1), "My ".concat(index + 1, " post"));
-            }));
+            return manager.save(u1);
 
           case 7:
-            console.log('Seed database successfully.');
+            post1 = new _Post.Post();
+            post1.title = 'Post 1';
+            post1.content = 'My first Post';
+            post1.author = u1;
+            _context.next = 13;
+            return manager.save(post1);
 
-          case 8:
-            _context.next = 10;
+          case 13:
+            c1 = new _Comment.Comment();
+            c1.user = u1;
+            c1.post = post1;
+            c1.content = 'Awesome!';
+            _context.next = 19;
+            return manager.save(c1);
+
+          case 19:
+            _context.next = 21;
             return connection.close();
 
-          case 10:
+          case 21:
+            console.log('Seed ran successfully!!');
+
+          case 22:
           case "end":
             return _context.stop();
         }

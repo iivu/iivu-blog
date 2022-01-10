@@ -6,15 +6,22 @@ import { User } from './entity/User';
 import { Comment } from './entity/Comment';
 
 createConnection().then(async connection => {
-  console.log('Inserting a new user into the database...');
-  const post = await connection.manager.find(Post);
-  if (!post.length) {
-    await connection.manager.save(
-      Array(20).fill(1).map((_, index) => {
-        return new Post(`Post${index + 1}`, `My ${index + 1} post`);
-      })
-    );
-    console.log('Seed database successfully.');
-  }
+  console.log('Running seed...');
+  const { manager } = connection;
+  const u1 = new User();
+  u1.username = 'Leo Cheung';
+  u1.passwordDigest = 'xxx';
+  await manager.save(u1);
+  const post1 = new Post();
+  post1.title = 'Post 1';
+  post1.content = 'My first Post';
+  post1.author = u1;
+  await manager.save(post1);
+  const c1 = new Comment();
+  c1.user = u1;
+  c1.post = post1;
+  c1.content = 'Awesome!';
+  await manager.save(c1);
   await connection.close();
+  console.log('Seed ran successfully!!');
 }).catch(error => console.log(error));
