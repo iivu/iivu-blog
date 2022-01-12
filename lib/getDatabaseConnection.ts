@@ -19,11 +19,11 @@ const connectionPromise = (async () => {
   const DEFAULT_CONNECTION_NAME = 'default';
   const manager = getConnectionManager();
   const hasDefaultConnection = manager.has(DEFAULT_CONNECTION_NAME);
-  if (!hasDefaultConnection) {
-    return create();
-  } else {
-    return manager.get(DEFAULT_CONNECTION_NAME);
+  if (hasDefaultConnection) {
+    const connection = manager.get(DEFAULT_CONNECTION_NAME);
+    await connection.close();
   }
+  return create();
 })();
 
 export const getDatabaseConnection = async () => connectionPromise;
