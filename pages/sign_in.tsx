@@ -1,5 +1,5 @@
 import React, { useState, useCallback, FormEvent } from 'react';
-import { NextPage, GetServerSideProps } from 'next';
+import { NextPage, GetServerSideProps, GetServerSidePropsContext } from 'next';
 import axios, { AxiosResponse } from 'axios';
 
 import { withSession } from '../lib/withSession';
@@ -69,8 +69,7 @@ const SignIn: NextPage<Props> = (props) => {
 };
 
 export const getServerSideProps: GetServerSideProps = withSession(
-  // @ts-ignore
-  async (ctx) => {
+  async (ctx: GetServerSidePropsContext) => {
     return {
       // @ts-ignore
       props: { user: ctx.req.session.get('currentUser') || null }
