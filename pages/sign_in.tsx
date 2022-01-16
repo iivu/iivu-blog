@@ -1,11 +1,16 @@
 import React, { useState, useCallback, FormEvent } from 'react';
-import { NextPage } from 'next';
+import { NextPage, GetServerSideProps } from 'next';
 import axios, { AxiosResponse } from 'axios';
+
+import { withSession } from '../lib/withSession';
+import { User } from '../src/entity/User';
 
 type FormData = { username: string, password: string }
 type FormError = { username: string[], password: string[] }
 
-const SignIn: NextPage = () => {
+type Props = { user: User }
+
+const SignIn: NextPage<Props> = (props) => {
   const [formData, setFormData] = useState<FormData>({
     username: '',
     password: '',
@@ -28,7 +33,10 @@ const SignIn: NextPage = () => {
       });
   };
   return (
-    <>
+    <React.Fragment>
+      {
+        props.user && <div>当前登录用户：{props.user.username}</div>
+      }
       <h1>登录</h1>
       <form onSubmit={onSubmit}>
         <div>
@@ -54,8 +62,18 @@ const SignIn: NextPage = () => {
           <button type="submit">登录</button>
         </div>
       </form>
-    </>
+    </React.Fragment>
   );
 };
+
+export const getServerSideProps: GetServerSideProps = withSession(
+  // @ts-ignore
+  async (ctx) => {
+    return {
+      // @ts-ignore
+      props: { user: ctx.req.session.get('currentUser') }
+    };
+  }
+);
 
 export default SignIn;
