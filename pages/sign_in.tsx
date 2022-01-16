@@ -23,6 +23,8 @@ const SignIn: NextPage<Props> = (props) => {
     e.preventDefault();
     axios.post('/api/v1/sessions', formData)
       .then(() => {
+        alert('登录成功');
+        window.location.reload();
       }, err => {
         if (err.response) {
           const res: AxiosResponse = err.response;
@@ -71,7 +73,7 @@ export const getServerSideProps: GetServerSideProps = withSession(
   async (ctx) => {
     return {
       // @ts-ignore
-      props: { user: ctx.req.session.get('currentUser') }
+      props: { user: ctx.req.session.get('currentUser') || null }
     };
   }
 );
