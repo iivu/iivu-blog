@@ -2,10 +2,9 @@ import React, { ChangeEventHandler, FormEventHandler, ReactChild, FC } from 'rea
 
 type Field = {
   label: string,
-  type: 'text' | 'password',
+  type: string,
   value: string | number,
-  onChange: ChangeEventHandler<HTMLInputElement>,
-  onSubmit: FormEventHandler,
+  onChange: ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>,
   errors: string[],
 }
 type Props = {
@@ -23,7 +22,11 @@ const Form: FC<Props> = props => {
           <div key={field.label}>
             <label>
               <span>{field.label}</span>
-              <input type={field.type} onChange={e => field.onChange(e)}/>
+              {
+                field.type === 'textarea' ?
+                  <textarea onChange={field.onChange}/> :
+                  <input type={field.type} onChange={field.onChange}/>
+              }
             </label>
             {
               field.errors?.length > 0 && <span>{field.errors.join('')}</span>
