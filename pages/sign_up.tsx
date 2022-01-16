@@ -1,6 +1,8 @@
-import React, { useState, useCallback, FormEvent } from 'react';
+import React, { useState, useCallback, FormEvent, ChangeEvent } from 'react';
 import { NextPage } from 'next';
 import axios, { AxiosResponse } from 'axios';
+
+import Form from '../components/Form'
 
 type FormData = { username: string, password: string, passwordConfirmation: string }
 type FormError = { username: string[], password: string[], passwordConfirmation: string[] }
@@ -30,44 +32,34 @@ const SignUp: NextPage = () => {
         }
       });
   };
+  const formField = [
+    {
+      label: '用户名',
+      type: 'text',
+      value: formData.username,
+      errors: formError.username,
+      onChange: (e: ChangeEvent<HTMLInputElement>) => updateFormData('username', e.target.value),
+    },
+    {
+      label: '密码',
+      type: 'password',
+      value: formData.password,
+      errors: formError.password,
+      onChange: (e: ChangeEvent<HTMLInputElement>) => updateFormData('password', e.target.value),
+    },
+    {
+      label: '确认密码',
+      type: 'passwordConfirmation',
+      value: formData.passwordConfirmation,
+      errors: formError.passwordConfirmation,
+      onChange: (e: ChangeEvent<HTMLInputElement>) => updateFormData('passwordConfirmation', e.target.value),
+    },
+  ]
   return (
     <>
       <h1>注册</h1>
-      <form onSubmit={onSubmit}>
-        <div>
-          <label>
-            <span>用户名</span>
-            <input type="text" value={formData.username} onChange={e => updateFormData('username', e.target.value)}/>
-          </label>
-          {
-            formError.username?.length > 0 && <span>{formError.username.join('')}</span>
-          }
-        </div>
-        <div>
-          <label>
-            <span>密码</span>
-            <input type="password" value={formData.password}
-                   onChange={e => updateFormData('password', e.target.value)}/>
-          </label>
-          {
-            formError.password?.length > 0 && <span>{formError.password.join('')}</span>
-          }
-        </div>
-        <div>
-          <label>
-            <span>确认密码</span>
-            <input type="password" value={formData.passwordConfirmation}
-                   onChange={e => updateFormData('passwordConfirmation', e.target.value)}
-            />
-          </label>
-          {
-            formError.passwordConfirmation?.length > 0 && <span>{formError.passwordConfirmation.join('')}</span>
-          }
-        </div>
-        <div>
-          <button type="submit">注册</button>
-        </div>
-      </form>
+      {/*// @ts-ignore*/}
+      <Form fields={formField} buttons={<button type="submit">注册</button>} onSubmit={onSubmit}/>
     </>
   );
 };
