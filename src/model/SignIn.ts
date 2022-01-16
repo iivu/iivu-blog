@@ -21,7 +21,7 @@ export class SignIn {
         this.errors.password.push('密码不匹配');
       }
     } else {
-      this.errors.username.push('用户名名不存在');
+      this.errors.username.push('用户名不存在');
     }
   }
 

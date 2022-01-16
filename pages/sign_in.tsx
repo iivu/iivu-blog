@@ -1,13 +1,14 @@
-import React, { useState, useCallback, FormEvent } from 'react';
+import React, { useState, useCallback, FormEvent, ChangeEvent } from 'react';
 import { NextPage, GetServerSideProps, GetServerSidePropsContext } from 'next';
 import axios, { AxiosResponse } from 'axios';
+
+import Form from '../components/Form';
 
 import { withSession } from '../lib/withSession';
 import { User } from '../src/entity/User';
 
 type FormData = { username: string, password: string }
 type FormError = { username: string[], password: string[] }
-
 type Props = { user: User }
 
 const SignIn: NextPage<Props> = (props) => {
@@ -34,36 +35,30 @@ const SignIn: NextPage<Props> = (props) => {
         }
       });
   };
+  const formField = [
+    {
+      label: '用户名',
+      type: 'text',
+      value: formData.username,
+      errors: formError.username,
+      onChange: (e: ChangeEvent<HTMLInputElement>) => updateFormData('username', e.target.value),
+    },
+    {
+      label: '密码',
+      type: 'password',
+      value: formData.password,
+      errors: formError.password,
+      onChange: (e: ChangeEvent<HTMLInputElement>) => updateFormData('password', e.target.value),
+    },
+  ];
   return (
     <React.Fragment>
       {
         props.user && <div>当前登录用户：{props.user.username}</div>
       }
       <h1>登录</h1>
-      <form onSubmit={onSubmit}>
-        <div>
-          <label>
-            <span>用户名</span>
-            <input type="text" value={formData.username} onChange={e => updateFormData('username', e.target.value)}/>
-          </label>
-          {
-            formError.username?.length > 0 && <span>{formError.username.join('')}</span>
-          }
-        </div>
-        <div>
-          <label>
-            <span>密码</span>
-            <input type="password" value={formData.password}
-                   onChange={e => updateFormData('password', e.target.value)}/>
-          </label>
-          {
-            formError.password?.length > 0 && <span>{formError.password.join('')}</span>
-          }
-        </div>
-        <div>
-          <button type="submit">登录</button>
-        </div>
-      </form>
+      {/*// @ts-ignore*/}
+      <Form fields={formField} buttons={<button type="submit">登录</button>} onSubmit={onSubmit}/>
     </React.Fragment>
   );
 };
