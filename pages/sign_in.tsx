@@ -2,37 +2,34 @@ import React, { useState, useCallback, FormEvent } from 'react';
 import { NextPage } from 'next';
 import axios, { AxiosResponse } from 'axios';
 
-type FormData = { username: string, password: string, passwordConfirmation: string }
-type FormError = { username: string[], password: string[], passwordConfirmation: string[] }
+type FormData = { username: string, password: string }
+type FormError = { username: string[], password: string[] }
 
-const SignUp: NextPage = () => {
+const SignIn: NextPage = () => {
   const [formData, setFormData] = useState<FormData>({
     username: '',
     password: '',
-    passwordConfirmation: '',
   });
   const [formError, setFormError] = useState<FormError>({
-    username: [], password: [], passwordConfirmation: []
+    username: [], password: []
   });
   const updateFormData = (k: keyof FormData, v: string) => setFormData({ ...formData, [k]: v });
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
-    axios.post('/api/v1/users', formData)
+    axios.post('/api/v1/sessions', formData)
       .then(() => {
-        alert('注册成功');
-        window.location.replace('/sign_in');
       }, err => {
         if (err.response) {
           const res: AxiosResponse = err.response;
           if (res.status === 422) {
-            setFormError({ username: [], password: [], passwordConfirmation: [], ...res.data });
+            setFormError({ username: [], password: [], ...res.data });
           }
         }
       });
   };
   return (
     <>
-      <h1>注册</h1>
+      <h1>登录</h1>
       <form onSubmit={onSubmit}>
         <div>
           <label>
@@ -54,22 +51,11 @@ const SignUp: NextPage = () => {
           }
         </div>
         <div>
-          <label>
-            <span>确认密码</span>
-            <input type="password" value={formData.passwordConfirmation}
-                   onChange={e => updateFormData('passwordConfirmation', e.target.value)}
-            />
-          </label>
-          {
-            formError.passwordConfirmation?.length > 0 && <span>{formError.passwordConfirmation.join('')}</span>
-          }
-        </div>
-        <div>
-          <button type="submit">注册</button>
+          <button type="submit">登录</button>
         </div>
       </form>
     </>
   );
 };
 
-export default SignUp;
+export default SignIn;
