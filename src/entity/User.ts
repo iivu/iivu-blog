@@ -1,5 +1,6 @@
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, BeforeInsert } from 'typeorm';
 import md5 from 'md5';
+import _ from 'lodash';
 
 import { Post } from './Post';
 import { Comment } from './Comment';
@@ -8,6 +9,14 @@ import { getDatabaseConnection } from '../../lib/getDatabaseConnection';
 
 @Entity('users')
 export class User {
+  errors: { username: string[], password: string[], passwordConfirmation: string[] } = {
+    username: [],
+    password: [],
+    passwordConfirmation: []
+  };
+  password: string;
+  passwordConfirmation: string;
+
   @PrimaryGeneratedColumn('increment')
   id: number;
 
@@ -29,19 +38,15 @@ export class User {
   @OneToMany(type => Comment, comment => comment.user)
   comments: Comment[];
 
-  errors: { username: string[], password: string[], passwordConfirmation: string[] } = {
-    username: [],
-    password: [],
-    passwordConfirmation: []
-  };
-  password: string;
-  passwordConfirmation: string;
+  @BeforeInsert()
+  createPasswordDigest() {
+    this.passwordDigest = md5(this.password);
+  }
 
   async validate() {
     const connection = await getDatabaseConnection();
     const foundUser = await connection.manager.find(User, { username: this.username });
     if (foundUser && foundUser.length > 0) {
-      console.log(foundUser);
       this.errors.username.push('用户名已存在');
     }
     if (!this.username.trim()) {
@@ -66,5 +71,9 @@ export class User {
 
   hasError(): boolean {
     return !!Object.values(this.errors).find(error => error.length > 0);
+  }
+
+  toJSON() {
+    return _.omit(this, ['password', 'passwordConfirmation', 'passwordDigest', 'errors']);
   }
 }
