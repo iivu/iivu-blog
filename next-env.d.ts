@@ -15,7 +15,7 @@ declare module 'next' {
   }
 }
 
-type Post = {
+declare type Post = {
   id: string;
   date: string;
   title: string;

@@ -1,37 +1,39 @@
-import React, { useCallback } from 'react';
-import { GetStaticProps, NextPage } from 'next';
+import React from 'react';
+import { GetServerSideProps, NextPage } from 'next';
 import Link from 'next/link';
 
-import { usePosts } from '../../hooks/usePosts';
-import { getPosts } from '../../lib/posts';
+
+import { Post } from 'src/entity/Post';
+import { getDatabaseConnection } from '../../lib/getDatabaseConnection';
 
 type Props = {
-  posts: Post[];
+  posts: Post[],
 }
 const PostsIndex: NextPage<Props> = (props) => {
   const { posts } = props;
-  console.log(posts);
   return (
-    <div>
-      <h1>文章列表</h1>
-      {posts.map(p => <div key={p.id}>
-        <Link href={`/posts/${p.id}`}>
-          <a>
-            {p.id}
-          </a>
-        </Link>
-      </div>)}
-    </div>
+    <>
+      <ul>
+        {
+          posts.map(post => (
+            <li key={post.id}>
+              <Link href={`/posts/${post.id}`}><a>{post.title}</a></Link>
+            </li>
+          ))
+        }
+      </ul>
+    </>
   );
 };
 
 export default PostsIndex;
 
-export const getStaticProps = async () => {
-  const posts = await getPosts();
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const connection = await getDatabaseConnection();
+  const posts = await connection.manager.find(Post);
   return {
     props: {
-      posts: JSON.parse(JSON.stringify(posts))
+      posts: JSON.parse(JSON.stringify(posts)),
     }
   };
 };

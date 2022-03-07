@@ -1,8 +1,8 @@
 import React from 'react';
 import { NextPage } from 'next';
-import axios, { AxiosResponse } from 'axios';
+import axios from 'axios';
 
-import { userForm } from '../../hooks/userForm';
+import { useForm } from '../../hooks/useForm';
 
 
 const PostNew: NextPage = () => {
@@ -11,25 +11,18 @@ const PostNew: NextPage = () => {
     { label: '标题', type: 'text', key: 'title' },
     { label: '内容', type: 'textarea', key: 'content' },
   ];
-  const onSubmit = (formData: typeof initFormData) => {
-    axios.post('/api/v1/posts', formData)
-      .then(() => {
-        alert('提交成功');
-      }, err => {
-        if (err.response) {
-          const res: AxiosResponse = err.response;
-          if (res.status === 422) {
-            setErrors({ title: [], content: [], ...res.data });
-          }
-        }
-      });
-  };
-  const { form, setErrors } = userForm(
+  const { form } = useForm(
     {
       initFormData,
       // @ts-ignore
-      fields:formField,
-      onSubmit,
+      fields: formField,
+      submit: {
+        request: fd => axios.post('/api/v1/posts', fd),
+        success: () => {
+          alert('提交成功');
+          window.location.replace('/posts');
+        }
+      },
       buttons: <button type="submit">提交</button>
     }
   );

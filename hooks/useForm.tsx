@@ -1,6 +1,7 @@
 import React, { FormEvent, ReactChild, useCallback, useState } from 'react';
+import { AxiosResponse } from 'axios';
 
-type OnSubmit<T> = (fd: T) => void
+type OnSubmit<T> = (fd: T) => Promise<void>
 type Field<T> = {
   label: string;
   type: string;
@@ -9,12 +10,15 @@ type Field<T> = {
 type UseFomOptions<T> = {
   initFormData: T;
   fields: Field<T>[];
-  onSubmit: OnSubmit<T>;
+  submit: {
+    request:OnSubmit<T>,
+    success: () => void
+  },
   buttons: ReactChild;
 }
 
-export function userForm<T>(options: UseFomOptions<T>) {
-  const { initFormData, fields, onSubmit, buttons } = options;
+export function useForm<T>(options: UseFomOptions<T>) {
+  const { initFormData, fields, submit, buttons } = options;
   const [formData, setFormData] = useState(initFormData);
   const [errors, setErrors] = useState(() => {
     const e: { [key in keyof T]?: string[] } = {};
@@ -30,8 +34,19 @@ export function userForm<T>(options: UseFomOptions<T>) {
   }, [formData]);
   const _onSubmit = useCallback((e: FormEvent) => {
     e.preventDefault();
-    onSubmit && onSubmit(formData);
-  }, [onSubmit, formData]);
+    submit.request(formData)
+      .then(submit.success,error => {
+        if(error.response) {
+          const response :AxiosResponse = error.response;
+          if(response.status === 422) {
+            setErrors(response.data)
+          } else if(response.status === 401) {
+            window.alert('请先登录');
+            window.location.replace(`/sign_in?return_to=${encodeURIComponent(window.location.pathname)}`);
+          }
+        }
+      })
+  }, [submit, formData]);
   const form = (
     <form onSubmit={_onSubmit}>
       {

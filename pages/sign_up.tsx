@@ -1,8 +1,8 @@
 import React from 'react';
 import { NextPage } from 'next';
-import axios, { AxiosResponse } from 'axios';
+import axios from 'axios';
 
-import { userForm } from '../hooks/userForm';
+import { useForm } from '../hooks/useForm';
 
 const SignUp: NextPage = () => {
   const initFormData = { username: '', password: '', passwordConfirmation: '', };
@@ -11,26 +11,18 @@ const SignUp: NextPage = () => {
     { label: '密码', type: 'password', key: 'password', },
     { label: '确认密码', type: 'passwordConfirmation', key: 'passwordConfirmation', },
   ];
-  const onSubmit = (formData: typeof initFormData) => {
-    axios.post('/api/v1/users', formData)
-      .then(() => {
-        alert('注册成功');
-        window.location.replace('/sign_in');
-      }, err => {
-        if (err.response) {
-          const res: AxiosResponse = err.response;
-          if (res.status === 422) {
-            setErrors({ username: [], password: [], passwordConfirmation: [], ...res.data });
-          }
-        }
-      });
-  };
-  const { form, setErrors } = userForm(
+  const { form } = useForm(
     {
       initFormData,
       // @ts-ignore
       fields: formField,
-      onSubmit,
+      submit: {
+        request: fd => axios.post('/api/v1/users', fd),
+        success: () => {
+          alert('注册成功');
+          window.location.replace('/sign_in');
+        }
+      },
       buttons: <button type="submit">注册</button>
     }
   );

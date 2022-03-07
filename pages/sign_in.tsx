@@ -1,11 +1,12 @@
 import React from 'react';
 import { NextPage, GetServerSideProps, GetServerSidePropsContext } from 'next';
 import axios, { AxiosResponse } from 'axios';
+import qs from 'query-string'
 
 
 import { withSession } from '../lib/withSession';
 import { User } from '../src/entity/User';
-import { userForm } from '../hooks/userForm';
+import { useForm } from '../hooks/userForm';
 
 type Props = { user: User }
 
@@ -19,7 +20,8 @@ const SignIn: NextPage<Props> = (props) => {
     axios.post('/api/v1/sessions', formData)
       .then(() => {
         alert('登录成功');
-        window.location.reload();
+        const query = qs.parse(window.location.search)
+        window.location.replace(query.return_to as string)
       }, err => {
         if (err.response) {
           const res: AxiosResponse = err.response;
@@ -29,7 +31,7 @@ const SignIn: NextPage<Props> = (props) => {
         }
       });
   };
-  const { form, setErrors } = userForm(
+  const { form, setErrors } = useForm(
     {
       initFormData,
       // @ts-ignore
